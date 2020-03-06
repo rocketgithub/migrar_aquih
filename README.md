@@ -2,5 +2,5 @@
 
 Comando recomendado
 ```
-python migrar_aquih.py | ssh odoo@host "psql -d database -f -"
+python migrar_aquih.py database user module | ssh odoo@host "psql -d database -f -"
 ```

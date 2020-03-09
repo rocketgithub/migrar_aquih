@@ -17,7 +17,7 @@ def insert(cur, tabla, columnas):
     for l in cur:
         print cur.mogrify("insert into {} ({}) values ({});".format(tabla, columnas_select, columnas_insert), l)
 
-    print cur.mogrify("select setval('{}_seq', (select max(id) from {})+1);".format(tabla, tabla))
+    print cur.mogrify("select setval('{}_id_seq', (select max(id) from {})+1);".format(tabla, tabla))
 
 conn = psycopg2.connect("dbname={} user={}".format(sys.argv[1], sys.argv[2]))
 cur = conn.cursor()
@@ -29,8 +29,8 @@ if 'albaran_analitico' in sys.argv:
 
 # bolson
 if 'bolson' in sys.argv:
-    print("update account_invoice set bolson_id = null from bolson_bolson where bolson_id = null;")
-    print("update account_payment set bolson_id = null from bolson_bolson where bolson_id = null;")
+    print("update account_invoice set bolson_id = null from bolson_bolson where bolson_id is not null;")
+    print("update account_payment set bolson_id = null from bolson_bolson where bolson_id is not null;")
     print("delete from bolson_bolson;")
 
     insert(cur, "bolson_bolson", ["id", "asiento", "create_uid", "name", "diario", "company_id", "create_date", "write_date", "cuenta_desajuste", "write_uid", "fecha", "usuario_id"])
@@ -66,13 +66,11 @@ if 'pos_gt' in sys.argv:
     update(cur, "pos_config", ["allow_discount", "allow_price_change", "ask_tag_number", "takeout_option", "default_client_id", "analytic_account_id", "id"])
     insert(cur, "pos_gt_extra", ["id", "name", "company_id", "type"])
     insert(cur, "pos_gt_extra_line", ["id", "name", "extra_id", "product_id", "qty", "price_extra", "company_currency_id"])
-    insert(cur, "pos_gt_extra_product_template_rel", ["product_template_id", "pos_gt_extra_id"])
+    insert(cur, "pos_gt_extra_product_template_rel", ["product_template_id", "pos_gt_extra_id"], set_sequence=False)
     update(cur, "res_users", ["default_pos_id", "id"])
 
 # pos_sat
 if 'pos_sat' in sys.argv:
-    print("delete from pos_gt_extra_product_template_rel;")
-
     insert(cur, "pos_sat_resolucion", ["id", "name", "fecha", "serie", "direccion", "inicial", "final", "primera", "valido", "tipo_doc", "fecha_ingreso", "fecha_vencimiento"])
     update(cur, "account_journal", ["requiere_resolucion", "ultimo_numero_factura", "id"])
     update(cur, "ir_sequence", ["resolucion_id", "id"])
@@ -85,39 +83,42 @@ if 'guateburger' in sys.argv:
     print("delete from pos_config_product_category_rel;")
 
     insert(cur, "guateburger_pedido_tienda", ["id", "name", "fecha", "default_pos_id", "state"])
-    # cur.execute("select id, name, fecha, default_pos_id, state from guateburger_pedido_tienda;")
-    # for l in cur:
-    #     print cur.mogrify("insert into guateburger_pedido_tienda (id, name, fecha, default_pos_id, state) values (%s, %s, %s, %s, %s);", l)
-
     insert(cur, "guateburger_pedido_tienda_linea", ["id", "pedido_tienda_id", "product_id", "uom_po_id", "cantidad"])
-    # cur.execute("select id, pedido_tienda_id, product_id, uom_po_id, cantidad from guateburger_pedido_tienda_linea;")
-    # for l in cur:
-    #     print cur.mogrify("insert into guateburger_pedido_tienda_linea (id, pedido_tienda_id, product_id, uom_po_id, cantidad) values (%s, %s, %s, %s, %s);", l)
-
     update(cur, "pos_config", ["tipo_impresora", "id"])
-    # cur.execute("select tipo_impresora, id from pos_config;")
-    # for l in cur:
-    #     print cur.mogrify("update pos_config set tipo_impresora = %s where id = %s;", l)
-
-    insert(cur, "pos_config_product_category_rel", ["pos_config_id", "product_category_id"])
-    # cur.execute("select pos_config_id, product_category_id from pos_config_product_category_rel;")
-    # for l in cur:
-    #     print cur.mogrify("insert into pos_config_product_category_rel (pos_config_id, product_category_id) values (%s, %s);", l)
-
+    insert(cur, "pos_config_product_category_rel", ["pos_config_id", "product_category_id"], set_sequence=False)
     update(cur, "purchase_order", ["fecha_recepcion_factura", "fecha_pago", "numero_factura", "id"])
-    # cur.execute("select fecha_recepcion_factura, fecha_pago, numero_factura, id from purchase_order;")
-    # for l in cur:
-    #     print cur.mogrify("update purchase_order set fecha_recepcion_factura = %s, fecha_pago = %s, numero_factura = %s where id = %s;", l)
-
     update(cur, "account_invoice", ["fecha_pago", "id"])
-    # cur.execute("select fecha_pago, id from account_invoice;")
-    # for l in cur:
-    #     print cur.mogrify("update account_invoice set fecha_pago = %s where id = %s;", l)
-
     update(cur, "res_partner", ["fecha_pago", "id"])
-    # cur.execute("select fecha_pago, id from res_partner;")
-    # for l in cur:
-    #     print cur.mogrify("update res_partner set fecha_pago = %s where id = %s;", l)
+
+# fel_infile
+if 'fel_infile' in sys.argv:
+    update(cur, "account_invoice", ["serie_fel", "numero_fel", "pdf_fel", "factura_original_id", "id"])
+    update(cur, "account_journal", ["usuario_fel", "clave_fel", "token_firma_fel", "codigo_establecimiento_fel", "tipo_documento_fel", "id"])
+    update(cur, "res_company", ["frases_fel", "adenda_fel", "id"])
+
+# importaciones
+if 'importaciones' in sys.argv:
+    print("delete from account_tax_importaciones_poliza_linea_rel;")
+    print("delete from account_invoice_importaciones_poliza_linea_rel;")
+    print("delete from importaciones_gasto_asociado_importaciones_poliza_linea_rel;")
+    print("delete from importaciones_gasto_asociado;")
+    print("delete from importaciones_documento_asociado;")
+    print("delete from importaciones_poliza_linea;")
+    print("delete from importaciones_poliza_linea;")
+    print("delete from importaciones_tipo_gasto;")
+
+    insert(cur, "importaciones_tipo_gasto", ["id", "name"])
+    insert(cur, "importaciones_poliza", ["id", "name", "fecha", "company_id", "poliza_aduana", "tipo_importacion", "guia", "transportista_id", "comentario", "moneda_base_id", "moneda_compra_id", "tasa", "arancel_total", "state"])
+    insert(cur, "importaciones_poliza_linea", ["id", "name", "poliza_id", "producto_id", "pedido", "cantidad", "impuestos_importacion_manual", "impuestos", "precio", "costo_proyectado", "costo", "porcentage_gasto", "porcentage_gasto_importacion", "total_gastos", "total_gastos_importacion", "costo_asignado"])
+    insert(cur, "importaciones_documento_asociado", ["id", "name", "poliza_id", "factura_id", "tipo_gasto_id"])
+    insert(cur, "importaciones_gasto_asociado", ["id", "name", "poliza_id", "valor", "tipo_gasto_id"])
+    insert(cur, "account_invoice_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "importaciones_gasto_asociado_id"], set_sequence=False)
+    insert(cur, "account_invoice_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "account_invoice_id"], set_sequence=False)
+    insert(cur, "account_tax_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "account_tax_id"], set_sequence=False)
+
+# pos_gface
+if 'pos_gface' in sys.argv:
+    pass
 
 cur.close()
 conn.close()

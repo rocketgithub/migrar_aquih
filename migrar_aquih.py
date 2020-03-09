@@ -9,7 +9,7 @@ def update(cur, tabla, columnas):
     for l in cur:
         print cur.mogrify("update {} set {} where id = %s;".format(tabla, columnas_update), l)
 
-def insert(cur, tabla, columnas):
+def insert(cur, tabla, columnas, set_sequence=True):
     columnas_select = ", ".join(columnas)
     columnas_insert = ", ".join(["%s" for x in columnas])
 
@@ -17,7 +17,8 @@ def insert(cur, tabla, columnas):
     for l in cur:
         print cur.mogrify("insert into {} ({}) values ({});".format(tabla, columnas_select, columnas_insert), l)
 
-    print cur.mogrify("select setval('{}_id_seq', (select max(id) from {})+1);".format(tabla, tabla))
+    if set_sequence is True:
+        print cur.mogrify("select setval('{}_id_seq', (select max(id) from {})+1);".format(tabla, tabla))
 
 conn = psycopg2.connect("dbname={} user={}".format(sys.argv[1], sys.argv[2]))
 cur = conn.cursor()
@@ -76,20 +77,6 @@ if 'pos_sat' in sys.argv:
     update(cur, "ir_sequence", ["resolucion_id", "id"])
     update(cur, "pos_order", ["numero_factura_impreso", "id"])
 
-# guateburger
-if 'guateburger' in sys.argv:
-    print("delete from guateburger_pedido_tienda_linea;")
-    print("delete from guateburger_pedido_tienda;")
-    print("delete from pos_config_product_category_rel;")
-
-    insert(cur, "guateburger_pedido_tienda", ["id", "name", "fecha", "default_pos_id", "state"])
-    insert(cur, "guateburger_pedido_tienda_linea", ["id", "pedido_tienda_id", "product_id", "uom_po_id", "cantidad"])
-    update(cur, "pos_config", ["tipo_impresora", "id"])
-    insert(cur, "pos_config_product_category_rel", ["pos_config_id", "product_category_id"], set_sequence=False)
-    update(cur, "purchase_order", ["fecha_recepcion_factura", "fecha_pago", "numero_factura", "id"])
-    update(cur, "account_invoice", ["fecha_pago", "id"])
-    update(cur, "res_partner", ["fecha_pago", "id"])
-
 # fel_infile
 if 'fel_infile' in sys.argv:
     update(cur, "account_invoice", ["serie_fel", "numero_fel", "pdf_fel", "factura_original_id", "id"])
@@ -119,6 +106,20 @@ if 'importaciones' in sys.argv:
 # pos_gface
 if 'pos_gface' in sys.argv:
     pass
+
+# guateburger
+if 'guateburger' in sys.argv:
+    print("delete from guateburger_pedido_tienda_linea;")
+    print("delete from guateburger_pedido_tienda;")
+    print("delete from pos_config_product_category_rel;")
+
+    insert(cur, "guateburger_pedido_tienda", ["id", "name", "fecha", "default_pos_id", "state"])
+    insert(cur, "guateburger_pedido_tienda_linea", ["id", "pedido_tienda_id", "product_id", "uom_po_id", "cantidad"])
+    update(cur, "pos_config", ["tipo_impresora", "id"])
+    insert(cur, "pos_config_product_category_rel", ["pos_config_id", "product_category_id"], set_sequence=False)
+    update(cur, "purchase_order", ["fecha_recepcion_factura", "fecha_pago", "numero_factura", "id"])
+    update(cur, "account_invoice", ["fecha_pago", "id"])
+    update(cur, "res_partner", ["fecha_pago", "id"])
 
 cur.close()
 conn.close()

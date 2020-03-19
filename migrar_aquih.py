@@ -119,7 +119,7 @@ if 'guateburger' in sys.argv:
     insert(cur, "pos_config_product_category_rel", ["pos_config_id", "product_category_id"], set_sequence=False)
     update(cur, "purchase_order", ["fecha_recepcion_factura", "fecha_pago", "numero_factura", "id"])
     update(cur, "account_invoice", ["fecha_pago", "id"])
-    update(cur, "res_partner", ["fecha_pago", "id"])
+    update(cur, "res_partner", ["correo_pagos", "id"])
 
 cur.close()
 conn.close()

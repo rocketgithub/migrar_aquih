@@ -91,7 +91,7 @@ if 'importaciones' in sys.argv:
     print("delete from importaciones_gasto_asociado;")
     print("delete from importaciones_documento_asociado;")
     print("delete from importaciones_poliza_linea;")
-    print("delete from importaciones_poliza_linea;")
+    print("delete from importaciones_poliza;")
     print("delete from importaciones_tipo_gasto;")
 
     insert(cur, "importaciones_tipo_gasto", ["id", "name"])
@@ -99,9 +99,10 @@ if 'importaciones' in sys.argv:
     insert(cur, "importaciones_poliza_linea", ["id", "name", "poliza_id", "producto_id", "pedido", "cantidad", "impuestos_importacion_manual", "impuestos", "precio", "costo_proyectado", "costo", "porcentage_gasto", "porcentage_gasto_importacion", "total_gastos", "total_gastos_importacion", "costo_asignado"])
     insert(cur, "importaciones_documento_asociado", ["id", "name", "poliza_id", "factura_id", "tipo_gasto_id"])
     insert(cur, "importaciones_gasto_asociado", ["id", "name", "poliza_id", "valor", "tipo_gasto_id"])
-    insert(cur, "account_invoice_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "importaciones_gasto_asociado_id"], set_sequence=False)
+    insert(cur, "importaciones_gasto_asociado_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "importaciones_gasto_asociado_id"], set_sequence=False)
     insert(cur, "account_invoice_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "account_invoice_id"], set_sequence=False)
     insert(cur, "account_tax_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "account_tax_id"], set_sequence=False)
+    update(cur, "purchase_order", ["poliza_id", "gasto_general_poliza", "id"])
 
 # pos_gface
 if 'pos_gface' in sys.argv:
@@ -120,6 +121,24 @@ if 'guateburger' in sys.argv:
     update(cur, "purchase_order", ["fecha_recepcion_factura", "fecha_pago", "numero_factura", "id"])
     update(cur, "account_invoice", ["fecha_pago", "id"])
     update(cur, "res_partner", ["correo_pagos", "id"])
+
+# grupo2g
+if 'grupo2g' in sys.argv:
+    print("delete from grupo2g_equivalente_linea;")
+    print("delete from grupo2g_linea;")
+    print("delete from grupo2g_clasificacion;")
+    print("delete from grupo2g_tipo;")
+    print("delete from grupo2g_marca;")
+
+    insert(cur, "grupo2g_marca", ["id", "name"])
+    insert(cur, "grupo2g_tipo", ["id", "nombre", "secuencia"])
+    insert(cur, "grupo2g_clasificacion", ["id", "nombre", "secuencia"])
+    insert(cur, "grupo2g_linea", ["id", "producto_id", "ubicacion_id", "localidad"])
+    insert(cur, "grupo2g_equivalente_linea", ["id", "producto_id", "marca", "numero", "actual"])
+    update(cur, "hr_employee", ["descuento_minimo", "descuento_maximo", "comision_minima", "comision_maxima", "id"])
+    update(cur, "pos_config", ["search_product_option", "id"])
+    update(cur, "product_template", ["codigo_viejo", "marca_id", "marca_id", "ubicacion_linea", "tipo", "clasificacion", "secuencia", "venta_tipica", "id"])
+    update(cur, "stock_location", ["picking_type_id", "id"])
 
 cur.close()
 conn.close()

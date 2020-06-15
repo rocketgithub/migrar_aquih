@@ -24,12 +24,12 @@ conn = psycopg2.connect("dbname={} user={}".format(sys.argv[1], sys.argv[2]))
 cur = conn.cursor()
 
 # albaran_analitico
-if 'albaran_analitico' in sys.argv:
+if 'albaran_analitico' in sys.argv[3]:
     update(cur, "stock_picking", ["cuenta_analitica_id", "id"])
     update(cur, "stock_inventory", ["cuenta_analitica_id", "id"])
 
 # bolson
-if 'bolson' in sys.argv:
+if 'bolson' in sys.argv[3]:
     print("update account_invoice set bolson_id = null from bolson_bolson where bolson_id is not null;")
     print("update account_payment set bolson_id = null from bolson_bolson where bolson_id is not null;")
     print("delete from bolson_bolson;")
@@ -39,25 +39,25 @@ if 'bolson' in sys.argv:
     update(cur, "account_payment", ["bolson_id", "id"])
 
 # conciliacion_bancaria
-if 'conciliacion_bancaria' in sys.argv:
+if 'conciliacion_bancaria' in sys.argv[3]:
     print("delete from conciliacion_bancaria_fecha;")
 
     insert(cur, "conciliacion_bancaria_fecha", ["id", "create_uid", "create_date", "fecha", "write_uid", "write_date", "move_id"])
 
 # gface_infile
-if 'gface_infile' in sys.argv:
+if 'gface_infile' in sys.argv[3]:
     update(cur, "account_invoice", ["firma_gface", "pdf_gface", "id"])
     update(cur, "account_journal", ["usuario_gface", "clave_gface", "nombre_establecimiento_gface", "tipo_documento_gface", "serie_documento_gface", "serie_gface", "numero_resolucion_gface", "fecha_resolucion_gface", "rango_inicial_gface", "rango_final_gface", "numero_establecimiento_gface", "dispositivo_gface", "id"])
 
 # l10n_gt_extra
-if 'l10n_gt_extra' in sys.argv:
+if 'l10n_gt_extra' in sys.argv[3]:
     update(cur, "account_invoice", ["tipo_gasto", "numero_viejo", "id"])
     update(cur, "account_payment", ["numero_viejo", "nombre_impreso", "id"])
     update(cur, "account_journal", ["direccion", "id"])
     update(cur, "res_partner", ["pequenio_contribuyente", "id"])
 
 # pos_gt
-if 'pos_gt' in sys.argv:
+if 'pos_gt' in sys.argv[3]:
     print("delete from pos_gt_bom_extra_line;")
     print("delete from pos_gt_extra_line;")
     print("delete from pos_gt_extra;")
@@ -71,20 +71,20 @@ if 'pos_gt' in sys.argv:
     update(cur, "res_users", ["default_pos_id", "id"])
 
 # pos_sat
-if 'pos_sat' in sys.argv:
+if 'pos_sat' in sys.argv[3]:
     insert(cur, "pos_sat_resolucion", ["id", "name", "fecha", "serie", "direccion", "inicial", "final", "primera", "valido", "tipo_doc", "fecha_ingreso", "fecha_vencimiento"])
     update(cur, "account_journal", ["requiere_resolucion", "ultimo_numero_factura", "id"])
     update(cur, "ir_sequence", ["resolucion_id", "id"])
     update(cur, "pos_order", ["numero_factura_impreso", "id"])
 
 # fel_infile
-if 'fel_infile' in sys.argv:
+if 'fel_infile' in sys.argv[3]:
     update(cur, "account_invoice", ["serie_fel", "numero_fel", "pdf_fel", "factura_original_id", "id"])
     update(cur, "account_journal", ["usuario_fel", "clave_fel", "token_firma_fel", "codigo_establecimiento_fel", "tipo_documento_fel", "id"])
     update(cur, "res_company", ["frases_fel", "adenda_fel", "id"])
 
 # importaciones
-if 'importaciones' in sys.argv:
+if 'importaciones' in sys.argv[3]:
     print("delete from account_tax_importaciones_poliza_linea_rel;")
     print("delete from account_invoice_importaciones_poliza_linea_rel;")
     print("delete from importaciones_gasto_asociado_importaciones_poliza_linea_rel;")
@@ -103,13 +103,33 @@ if 'importaciones' in sys.argv:
     insert(cur, "account_invoice_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "account_invoice_id"], set_sequence=False)
     insert(cur, "account_tax_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "account_tax_id"], set_sequence=False)
     update(cur, "purchase_order", ["poliza_id", "gasto_general_poliza", "id"])
+    
+# rrhh
+if 'rrhh' in sys.argv[3]:
+    print("delete from hr_salary_rule_rrhh_recibo_linea_rel;")
+    print("delete from rrhh_recibo_linea;")
+    print("delete from rrhh_recibo;")
+    print("delete from hr_salary_rule_rrhh_planilla_columna_rel;")
+    print("delete from rrhh_planilla_columna;")
+    print("delete from rrhh_planilla;")
+    
+    update(cur, "hr_contract_type", ["calcula_indemnizacion", "id"])
+    update(cur, "hr_contract", ["motivo_terminacion", "base_extra", "wage", "id"])
+    update(cur, "hr_employee", ["numero_liquidacion", "codigo_centro_trabajo", "codigo_ocupacion", "condicion_laboral", "department_id", "diario_pago_id", "igss", "irtra", "nit", "recibo_id", "nivel_academico", "profesion", "etnia", "idioma", "pais_origen", "trabajado_extranjero", "motivo_finalizacion", "jornada_trabajo", "permiso_trabajo", "contacto_emergencia", "marital", "vecindad_dpi", "tarjeta_salud", "tarjeta_manipulacion", "tarjeta_pulmones", "tarjeta_fecha_vencimiento", "codigo_empleado", "id"])
+    insert(cur, "rrhh_planilla", ["id", "name", "descripcion"])
+    insert(cur, "rrhh_planilla_columna", ["id", "name", "sequence", "planilla_id", "sumar"])
+    insert(cur, "hr_salary_rule_rrhh_planilla_columna_rel", ["rrhh_planilla_columna_id", "hr_salary_rule_id"], set_sequence=False)
+    insert(cur, "rrhh_recibo", ["id", "name", "descripcion"])
+    insert(cur, "rrhh_recibo_linea", ["id", "name", "tipo", "sequence", "recibo_id"])
+    insert(cur, "hr_salary_rule_rrhh_recibo_linea_rel", ["rrhh_recibo_linea_id", "hr_salary_rule_id"], set_sequence=False)
+    update(cur, "res_company", ["version_mensaje", "numero_patronal", "tipo_planilla", "codigo_centro_trabajo", "nombre_centro_trabajo", "direccion_centro_trabajo", "zona_centro_trabajo", "telefonos", "nombre_contacto", "correo_electronico", "codigo_departamento", "codigo_municipio", "codigo_actividad_economica", "identificacion_tipo_planilla", "nombre_tipo_planilla", "tipo_afiliados", "periodo_planilla", "departamento_republica", "actividad_economica", "clase_planilla", "id"])
 
 # pos_gface
-if 'pos_gface' in sys.argv:
+if 'pos_gface' in sys.argv[3]:
     pass
 
 # guateburger
-if 'guateburger' in sys.argv:
+if 'guateburger' in sys.argv[3]:
     print("delete from guateburger_pedido_tienda_linea;")
     print("delete from guateburger_pedido_tienda;")
     print("delete from pos_config_product_category_rel;")
@@ -123,7 +143,7 @@ if 'guateburger' in sys.argv:
     update(cur, "res_partner", ["correo_pagos", "id"])
 
 # grupo2g
-if 'grupo2g' in sys.argv:
+if 'grupo2g' in sys.argv[3]:
     print("delete from grupo2g_equivalente_linea;")
     print("delete from grupo2g_linea;")
     print("delete from grupo2g_clasificacion;")
@@ -137,7 +157,7 @@ if 'grupo2g' in sys.argv:
     insert(cur, "grupo2g_equivalente_linea", ["id", "producto_id", "marca", "numero", "actual"])
     update(cur, "hr_employee", ["descuento_minimo", "descuento_maximo", "comision_minima", "comision_maxima", "id"])
     update(cur, "pos_config", ["search_product_option", "id"])
-    update(cur, "product_template", ["codigo_viejo", "marca_id", "marca_id", "ubicacion_linea", "tipo", "clasificacion", "secuencia", "venta_tipica", "id"])
+    update(cur, "product_template", ["codigo_viejo", "marca_id", "tipo", "clasificacion", "secuencia", "venta_tipica", "id"])
     update(cur, "stock_location", ["picking_type_id", "id"])
 
 cur.close()

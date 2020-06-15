@@ -113,14 +113,14 @@ if 'rrhh' in sys.argv[3]:
     print("delete from rrhh_planilla_columna;")
     print("delete from rrhh_planilla;")
     
+    insert(cur, "rrhh_recibo", ["id", "name", "descripcion"])
+    insert(cur, "rrhh_recibo_linea", ["id", "name", "tipo", "sequence", "recibo_id"])
     update(cur, "hr_contract_type", ["calcula_indemnizacion", "id"])
     update(cur, "hr_contract", ["motivo_terminacion", "base_extra", "wage", "id"])
     update(cur, "hr_employee", ["numero_liquidacion", "codigo_centro_trabajo", "codigo_ocupacion", "condicion_laboral", "department_id", "diario_pago_id", "igss", "irtra", "nit", "recibo_id", "nivel_academico", "profesion", "etnia", "idioma", "pais_origen", "trabajado_extranjero", "motivo_finalizacion", "jornada_trabajo", "permiso_trabajo", "contacto_emergencia", "marital", "vecindad_dpi", "tarjeta_salud", "tarjeta_manipulacion", "tarjeta_pulmones", "tarjeta_fecha_vencimiento", "codigo_empleado", "id"])
     insert(cur, "rrhh_planilla", ["id", "name", "descripcion"])
     insert(cur, "rrhh_planilla_columna", ["id", "name", "sequence", "planilla_id", "sumar"])
     insert(cur, "hr_salary_rule_rrhh_planilla_columna_rel", ["rrhh_planilla_columna_id", "hr_salary_rule_id"], set_sequence=False)
-    insert(cur, "rrhh_recibo", ["id", "name", "descripcion"])
-    insert(cur, "rrhh_recibo_linea", ["id", "name", "tipo", "sequence", "recibo_id"])
     insert(cur, "hr_salary_rule_rrhh_recibo_linea_rel", ["rrhh_recibo_linea_id", "hr_salary_rule_id"], set_sequence=False)
     update(cur, "res_company", ["version_mensaje", "numero_patronal", "tipo_planilla", "codigo_centro_trabajo", "nombre_centro_trabajo", "direccion_centro_trabajo", "zona_centro_trabajo", "telefonos", "nombre_contacto", "correo_electronico", "codigo_departamento", "codigo_municipio", "codigo_actividad_economica", "identificacion_tipo_planilla", "nombre_tipo_planilla", "tipo_afiliados", "periodo_planilla", "departamento_republica", "actividad_economica", "clase_planilla", "id"])
 

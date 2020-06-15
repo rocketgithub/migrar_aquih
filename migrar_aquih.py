@@ -127,6 +127,10 @@ if 'rrhh' in sys.argv[3]:
 # pos_gface
 if 'pos_gface' in sys.argv[3]:
     pass
+    
+# pos_guardar
+if 'pos_guardar' in sys.argv[3]:
+    update(cur, "pos_config", ["save_order_option", "load_order_option", "load_order_session_option", "session_save_order", "opcion_pedidos_vendedor", "id"])
 
 # guateburger
 if 'guateburger' in sys.argv[3]:

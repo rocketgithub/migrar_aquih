@@ -80,8 +80,8 @@ if 'pos_sat' in sys.argv[3]:
 # fel_infile
 if 'fel_infile' in sys.argv[3]:
     update(cur, "account_invoice", ["firma_fel", "serie_fel", "numero_fel", "pdf_fel", "factura_original_id", "id"])
-#    update(cur, "account_journal", ["usuario_fel", "clave_fel", "token_firma_fel", "codigo_establecimiento_fel", "tipo_documento_fel", "id"])
-#    update(cur, "res_company", ["frases_fel", "adenda_fel", "id"])
+    update(cur, "account_journal", ["usuario_fel", "clave_fel", "token_firma_fel", "codigo_establecimiento_fel", "tipo_documento_fel", "id"])
+    update(cur, "res_company", ["frases_fel", "adenda_fel", "id"])
 
 # importaciones
 if 'importaciones' in sys.argv[3]:

@@ -164,5 +164,9 @@ if 'grupo2g' in sys.argv[3]:
     update(cur, "product_template", ["codigo_viejo", "marca_id", "tipo", "clasificacion", "secuencia", "venta_tipica", "id"])
     update(cur, "stock_location", ["picking_type_id", "id"])
 
+# donlimon
+if 'donlimon' in sys.argv[3]:
+    update(cur, "donlimon_gastos", ["product_id", "product_qty", "price_unit", "location_id", "basado_en_cantidades", "id"])
+
 cur.close()
 conn.close()

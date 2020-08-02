@@ -166,7 +166,17 @@ if 'grupo2g' in sys.argv[3]:
 
 # donlimon
 if 'donlimon' in sys.argv[3]:
-    update(cur, "donlimon_gastos", ["product_id", "product_qty", "price_unit", "location_id", "basado_en_cantidades", "id"])
+    print("delete from donlimon_gastos;")
+
+    insert(cur, "donlimon_gastos", ["product_id", "product_qty", "price_unit", "location_id", "basado_en_cantidades"])
+    update(cur, "account_invoice_line", ["lote_id", "id"])
+    update(cur, "product_template", ["brand", "origen", "id"])
+    update(cur, "purchase_order", ["venta_origen_id", "compra_origen_id", "id"])
+    update(cur, "purchase_order_line", ["lote_id", "id"])
+    update(cur, "sale_order", ["calcular_precios", "id"])
+    update(cur, "sale_order_line", ["lote_id", "precio_calculado", "precio_base", "diferencia_precio", "id"])
+    update(cur, "stock_location", ["proveedor_id", "id"])
+    update(cur, "stock_production_lot", ["fecha", "analytic_account_id", "state", "id"])
 
 cur.close()
 conn.close()

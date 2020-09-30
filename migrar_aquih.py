@@ -7,18 +7,26 @@ def update(cur, tabla, columnas):
 
     cur.execute("select {} from {}".format(columnas_select, tabla))
     for l in cur:
-        print cur.mogrify("update {} set {} where id = %s;".format(tabla, columnas_update), l)
+        print(cur.mogrify("update {} set {} where id = %s;".format(nombre_tabla_nueva, columnas_update), l))
 
-def insert(cur, tabla, columnas, set_sequence=True):
+def insert(cur, tabla, columnas, iniciar_seq=True):
     columnas_select = ", ".join(columnas)
     columnas_insert = ", ".join(["%s" for x in columnas])
 
     cur.execute("select {} from {}".format(columnas_select, tabla))
     for l in cur:
-        print cur.mogrify("insert into {} ({}) values ({});".format(tabla, columnas_select, columnas_insert), l)
+        print(cur.mogrify("insert into {} ({}) values ({});".format(tabla, columnas_select, columnas_insert), l))
 
-    if set_sequence is True:
-        print cur.mogrify("select setval('{}_id_seq', (select max(id) from {})+1);".format(tabla, tabla))
+    if iniciar_seq is True:
+        print(cur.mogrify("select setval('{}_id_seq', (select max(id) from {})+1);".format(tabla, tabla)))
+
+def update_invoice(cur, columnas):
+    columnas_select = ", ".join(columnas)+"as id"
+    columnas_update = ", ".join([x+" = %s" for x in columnas[: -1]])
+
+    cur.execute("select {} from {}".format(columnas_select, "invoice"))
+    for l in cur:
+        print(cur.mogrify("update {} set {} where id = %s;".format(nombre_tabla_nueva, columnas_update), l)
 
 conn = psycopg2.connect("dbname={} user={}".format(sys.argv[1], sys.argv[2]))
 cur = conn.cursor()
@@ -55,7 +63,7 @@ if 'gface_infile' in sys.argv[3]:
 
 # l10n_gt_extra
 if 'l10n_gt_extra' in sys.argv[3]:
-    update(cur, "account_move", ["tipo_gasto", "numero_viejo", "id"])
+    update_invoice(cur, ["tipo_gasto", "numero_viejo", "move_id"])
     update(cur, "account_payment", ["numero_viejo", "nombre_impreso", "id"])
     update(cur, "account_journal", ["direccion", "id"])
     update(cur, "res_partner", ["pequenio_contribuyente", "cui", "no_validar_nit", "id"])
@@ -71,7 +79,7 @@ if 'pos_gt' in sys.argv[3]:
     update(cur, "pos_config", ["allow_discount", "allow_price_change", "ask_tag_number", "takeout_option", "default_client_id", "analytic_account_id", "id"])
     insert(cur, "pos_gt_extra", ["id", "name", "company_id", "type"])
     insert(cur, "pos_gt_extra_line", ["id", "name", "extra_id", "product_id", "qty", "price_extra", "company_currency_id"])
-    insert(cur, "pos_gt_extra_product_template_rel", ["product_template_id", "pos_gt_extra_id"], set_sequence=False)
+    insert(cur, "pos_gt_extra_product_template_rel", ["product_template_id", "pos_gt_extra_id"], iniciar_seq=False)
     update(cur, "res_users", ["default_pos_id", "id"])
 
 # pos_sat
@@ -103,9 +111,9 @@ if 'importaciones' in sys.argv[3]:
     insert(cur, "importaciones_poliza_linea", ["id", "name", "poliza_id", "producto_id", "pedido", "cantidad", "impuestos_importacion_manual", "impuestos", "precio", "costo_proyectado", "costo", "porcentage_gasto", "porcentage_gasto_importacion", "total_gastos", "total_gastos_importacion", "costo_asignado"])
     insert(cur, "importaciones_documento_asociado", ["id", "name", "poliza_id", "factura_id", "tipo_gasto_id"])
     insert(cur, "importaciones_gasto_asociado", ["id", "name", "poliza_id", "valor", "tipo_gasto_id"])
-    insert(cur, "importaciones_gasto_asociado_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "importaciones_gasto_asociado_id"], set_sequence=False)
-    insert(cur, "account_invoice_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "account_invoice_id"], set_sequence=False)
-    insert(cur, "account_tax_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "account_tax_id"], set_sequence=False)
+    insert(cur, "importaciones_gasto_asociado_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "importaciones_gasto_asociado_id"], iniciar_seq=False)
+    insert(cur, "account_invoice_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "account_invoice_id"], iniciar_seq=False)
+    insert(cur, "account_tax_importaciones_poliza_linea_rel", ["importaciones_poliza_linea_id", "account_tax_id"], iniciar_seq=False)
     update(cur, "purchase_order", ["poliza_id", "gasto_general_poliza", "id"])
     
 # rrhh
@@ -124,8 +132,8 @@ if 'rrhh' in sys.argv[3]:
     update(cur, "hr_employee", ["numero_liquidacion", "codigo_centro_trabajo", "codigo_ocupacion", "condicion_laboral", "department_id", "diario_pago_id", "igss", "irtra", "nit", "recibo_id", "nivel_academico", "profesion", "etnia", "idioma", "pais_origen", "trabajado_extranjero", "motivo_finalizacion", "jornada_trabajo", "permiso_trabajo", "contacto_emergencia", "marital", "vecindad_dpi", "tarjeta_salud", "tarjeta_manipulacion", "tarjeta_pulmones", "tarjeta_fecha_vencimiento", "codigo_empleado", "id"])
     insert(cur, "rrhh_planilla", ["id", "name", "descripcion"])
     insert(cur, "rrhh_planilla_columna", ["id", "name", "sequence", "planilla_id", "sumar"])
-    insert(cur, "hr_salary_rule_rrhh_planilla_columna_rel", ["rrhh_planilla_columna_id", "hr_salary_rule_id"], set_sequence=False)
-    insert(cur, "hr_salary_rule_rrhh_recibo_linea_rel", ["rrhh_recibo_linea_id", "hr_salary_rule_id"], set_sequence=False)
+    insert(cur, "hr_salary_rule_rrhh_planilla_columna_rel", ["rrhh_planilla_columna_id", "hr_salary_rule_id"], iniciar_seq=False)
+    insert(cur, "hr_salary_rule_rrhh_recibo_linea_rel", ["rrhh_recibo_linea_id", "hr_salary_rule_id"], iniciar_seq=False)
     update(cur, "res_company", ["version_mensaje", "numero_patronal", "tipo_planilla", "codigo_centro_trabajo", "nombre_centro_trabajo", "direccion_centro_trabajo", "zona_centro_trabajo", "telefonos", "nombre_contacto", "correo_electronico", "codigo_departamento", "codigo_municipio", "codigo_actividad_economica", "identificacion_tipo_planilla", "nombre_tipo_planilla", "tipo_afiliados", "periodo_planilla", "departamento_republica", "actividad_economica", "clase_planilla", "id"])
 
 # pos_gface
@@ -145,7 +153,7 @@ if 'guateburger' in sys.argv[3]:
     insert(cur, "guateburger_pedido_tienda", ["id", "name", "fecha", "default_pos_id", "state"])
     insert(cur, "guateburger_pedido_tienda_linea", ["id", "pedido_tienda_id", "product_id", "uom_po_id", "cantidad"])
     update(cur, "pos_config", ["tipo_impresora", "id"])
-    insert(cur, "pos_config_product_category_rel", ["pos_config_id", "product_category_id"], set_sequence=False)
+    insert(cur, "pos_config_product_category_rel", ["pos_config_id", "product_category_id"], iniciar_seq=False)
     update(cur, "purchase_order", ["fecha_recepcion_factura", "fecha_pago", "numero_factura", "id"])
     update(cur, "account_invoice", ["fecha_pago", "id"])
     update(cur, "res_partner", ["correo_pagos", "id"])

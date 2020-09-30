@@ -30,12 +30,12 @@ if 'albaran_analitico' in sys.argv[3]:
 
 # bolson
 if 'bolson' in sys.argv[3]:
-    print("update account_invoice set bolson_id = null from bolson_bolson where bolson_id is not null;")
+    print("update account_move set bolson_id = null from bolson_bolson where bolson_id is not null;")
     print("update account_payment set bolson_id = null from bolson_bolson where bolson_id is not null;")
     print("delete from bolson_bolson;")
 
     insert(cur, "bolson_bolson", ["id", "asiento", "create_uid", "name", "diario", "company_id", "create_date", "write_date", "cuenta_desajuste", "write_uid", "fecha", "usuario_id"])
-    update(cur, "account_invoice", ["bolson_id", "id"])
+    update(cur, "account_move", ["bolson_id", "id"])
     update(cur, "account_payment", ["bolson_id", "id"])
 
 # conciliacion_bancaria
@@ -49,12 +49,16 @@ if 'gface_infile' in sys.argv[3]:
     update(cur, "account_invoice", ["firma_gface", "pdf_gface", "id"])
     update(cur, "account_journal", ["usuario_gface", "clave_gface", "nombre_establecimiento_gface", "tipo_documento_gface", "serie_documento_gface", "serie_gface", "numero_resolucion_gface", "fecha_resolucion_gface", "rango_inicial_gface", "rango_final_gface", "numero_establecimiento_gface", "dispositivo_gface", "id"])
 
+# gface_ecofacturas
+if 'gface_infile' in sys.argv[3]:
+    update(cur, "account_invoice", ["firma_gface", "pdf_gface", "id"])
+
 # l10n_gt_extra
 if 'l10n_gt_extra' in sys.argv[3]:
-    update(cur, "account_invoice", ["tipo_gasto", "numero_viejo", "id"])
+    update(cur, "account_move", ["tipo_gasto", "numero_viejo", "id"])
     update(cur, "account_payment", ["numero_viejo", "nombre_impreso", "id"])
     update(cur, "account_journal", ["direccion", "id"])
-    update(cur, "res_partner", ["pequenio_contribuyente", "id"])
+    update(cur, "res_partner", ["pequenio_contribuyente", "cui", "no_validar_nit", "id"])
 
 # pos_gt
 if 'pos_gt' in sys.argv[3]:
@@ -77,10 +81,10 @@ if 'pos_sat' in sys.argv[3]:
     update(cur, "ir_sequence", ["resolucion_id", "id"])
     update(cur, "pos_order", ["numero_factura_impreso", "id"])
 
-# fel_infile
+# fel_gt
 if 'fel_infile' in sys.argv[3]:
-    update(cur, "account_invoice", ["firma_fel", "serie_fel", "numero_fel", "pdf_fel", "factura_original_id", "id"])
-    update(cur, "account_journal", ["usuario_fel", "clave_fel", "token_firma_fel", "codigo_establecimiento_fel", "tipo_documento_fel", "id"])
+    update(cur, "account_move", ["firma_fel", "serie_fel", "numero_fel", "factura_original_id", "consignatario_fel", "comprador_fel", "exportador_fel", "incoterm_fel", "incoterm_fel", "id"])
+    update(cur, "account_journal", ["tipo_documento_fel", "id"])
     update(cur, "res_company", ["frases_fel", "adenda_fel", "id"])
 
 # importaciones

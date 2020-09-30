@@ -7,7 +7,7 @@ def update(cur, tabla, columnas):
 
     cur.execute("select {} from {}".format(columnas_select, tabla))
     for l in cur:
-        print(cur.mogrify("update {} set {} where id = %s;".format(nombre_tabla_nueva, columnas_update), l))
+        print(cur.mogrify("update {} set {} where id = %s;".format(tabla, columnas_update), l))
 
 def insert(cur, tabla, columnas, iniciar_seq=True):
     columnas_select = ", ".join(columnas)
@@ -21,12 +21,12 @@ def insert(cur, tabla, columnas, iniciar_seq=True):
         print(cur.mogrify("select setval('{}_id_seq', (select max(id) from {})+1);".format(tabla, tabla)))
 
 def update_invoice(cur, columnas):
-    columnas_select = ", ".join(columnas)+"as id"
+    columnas_select = ", ".join(columnas)+" as id"
     columnas_update = ", ".join([x+" = %s" for x in columnas[: -1]])
 
-    cur.execute("select {} from {}".format(columnas_select, "invoice"))
+    cur.execute("select {} from {}".format(columnas_select, "account_invoice"))
     for l in cur:
-        print(cur.mogrify("update {} set {} where id = %s;".format(nombre_tabla_nueva, columnas_update), l)
+        print(cur.mogrify("update {} set {} where id = %s;".format("account_move", columnas_update), l))
 
 conn = psycopg2.connect("dbname={} user={}".format(sys.argv[1], sys.argv[2]))
 cur = conn.cursor()
@@ -43,7 +43,7 @@ if 'bolson' in sys.argv[3]:
     print("delete from bolson_bolson;")
 
     insert(cur, "bolson_bolson", ["id", "asiento", "create_uid", "name", "diario", "company_id", "create_date", "write_date", "cuenta_desajuste", "write_uid", "fecha", "usuario_id"])
-    update(cur, "account_move", ["bolson_id", "id"])
+    update_invoice(cur, ["bolson_id", "move_id"])
     update(cur, "account_payment", ["bolson_id", "id"])
 
 # conciliacion_bancaria
@@ -54,7 +54,7 @@ if 'conciliacion_bancaria' in sys.argv[3]:
 
 # gface_infile
 if 'gface_infile' in sys.argv[3]:
-    update(cur, "account_invoice", ["firma_gface", "pdf_gface", "id"])
+    update_invoice(cur, ["firma_gface", "pdf_gface", "move_id"])
     update(cur, "account_journal", ["usuario_gface", "clave_gface", "nombre_establecimiento_gface", "tipo_documento_gface", "serie_documento_gface", "serie_gface", "numero_resolucion_gface", "fecha_resolucion_gface", "rango_inicial_gface", "rango_final_gface", "numero_establecimiento_gface", "dispositivo_gface", "id"])
 
 # gface_ecofacturas
@@ -63,7 +63,7 @@ if 'gface_infile' in sys.argv[3]:
 
 # l10n_gt_extra
 if 'l10n_gt_extra' in sys.argv[3]:
-    update_invoice(cur, ["tipo_gasto", "numero_viejo", "move_id"])
+    update_invoice(cur, ["tipo_gasto", "move_id"])
     update(cur, "account_payment", ["numero_viejo", "nombre_impreso", "id"])
     update(cur, "account_journal", ["direccion", "id"])
     update(cur, "res_partner", ["pequenio_contribuyente", "cui", "no_validar_nit", "id"])
@@ -91,7 +91,7 @@ if 'pos_sat' in sys.argv[3]:
 
 # fel_gt
 if 'fel_infile' in sys.argv[3]:
-    update(cur, "account_move", ["firma_fel", "serie_fel", "numero_fel", "factura_original_id", "consignatario_fel", "comprador_fel", "exportador_fel", "incoterm_fel", "incoterm_fel", "id"])
+    update_invoice(cur, ["firma_fel", "serie_fel", "numero_fel", "factura_original_id", "consignatario_fel", "comprador_fel", "exportador_fel", "incoterm_fel", "incoterm_fel", "move_id"])
     update(cur, "account_journal", ["tipo_documento_fel", "id"])
     update(cur, "res_company", ["frases_fel", "adenda_fel", "id"])
 

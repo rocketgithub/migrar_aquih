@@ -59,7 +59,11 @@ if 'gface_infile' in sys.argv[3]:
 
 # gface_ecofacturas
 if 'gface_ecofacturas' in sys.argv[3]:
-    update_invoice(cur, ["firma_gface", "pdf_gface", "move_id"])
+    cur.execute("select {} from {}".format("name as ref, move_id", "account_invoice"))
+    for l in cur:
+        print(cur.mogrify("update {} set {} where id = %s;".format("account_move", "ref = %s"), l).decode("utf-8"))
+
+    #update_invoice(cur, ["firma_gface", "pdf_gface", "move_id"])
 
 # l10n_gt_extra
 if 'l10n_gt_extra' in sys.argv[3]:

@@ -58,8 +58,8 @@ if 'gface_infile' in sys.argv[3]:
     update(cur, "account_journal", ["usuario_gface", "clave_gface", "nombre_establecimiento_gface", "tipo_documento_gface", "serie_documento_gface", "serie_gface", "numero_resolucion_gface", "fecha_resolucion_gface", "rango_inicial_gface", "rango_final_gface", "numero_establecimiento_gface", "dispositivo_gface", "id"])
 
 # gface_ecofacturas
-if 'gface_infile' in sys.argv[3]:
-    update(cur, "account_invoice", ["firma_gface", "pdf_gface", "id"])
+if 'gface_ecofacturas' in sys.argv[3]:
+    update_invoice(cur, ["firma_gface", "pdf_gface", "move_id"])
 
 # l10n_gt_extra
 if 'l10n_gt_extra' in sys.argv[3]:
@@ -90,10 +90,14 @@ if 'pos_sat' in sys.argv[3]:
     update(cur, "pos_order", ["numero_factura_impreso", "id"])
 
 # fel_gt
-if 'fel_infile' in sys.argv[3]:
-    update_invoice(cur, ["firma_fel", "serie_fel", "numero_fel", "factura_original_id", "consignatario_fel", "comprador_fel", "exportador_fel", "incoterm_fel", "incoterm_fel", "move_id"])
+if 'fel_gt' in sys.argv[3]:
+    update_invoice(cur, ["firma_fel", "serie_fel", "numero_fel", "factura_original_id", "consignatario_fel", "comprador_fel", "exportador_fel", "incoterm_fel", "move_id"])
     update(cur, "account_journal", ["tipo_documento_fel", "id"])
     update(cur, "res_company", ["frases_fel", "adenda_fel", "id"])
+
+# fel_infile
+if 'fel_infile' in sys.argv[3]:
+    update_invoice(cur, ["pdf_fel", "move_id"])
 
 # importaciones
 if 'importaciones' in sys.argv[3]:

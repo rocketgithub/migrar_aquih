@@ -7,7 +7,7 @@ def update(cur, tabla, columnas):
 
     cur.execute("select {} from {}".format(columnas_select, tabla))
     for l in cur:
-        print(cur.mogrify("update {} set {} where id = %s;".format(tabla, columnas_update), l))
+        print(cur.mogrify("update {} set {} where id = %s;".format(tabla, columnas_update), l).decode("utf-8"))
 
 def insert(cur, tabla, columnas, iniciar_seq=True):
     columnas_select = ", ".join(columnas)
@@ -15,10 +15,10 @@ def insert(cur, tabla, columnas, iniciar_seq=True):
 
     cur.execute("select {} from {}".format(columnas_select, tabla))
     for l in cur:
-        print(cur.mogrify("insert into {} ({}) values ({});".format(tabla, columnas_select, columnas_insert), l))
+        print(cur.mogrify("insert into {} ({}) values ({});".format(tabla, columnas_select, columnas_insert), l).decode("utf-8"))
 
     if iniciar_seq is True:
-        print(cur.mogrify("select setval('{}_id_seq', (select max(id) from {})+1);".format(tabla, tabla)))
+        print(cur.mogrify("select setval('{}_id_seq', (select max(id) from {})+1);".format(tabla, tabla)).decode("utf-8"))
 
 def update_invoice(cur, columnas):
     columnas_select = ", ".join(columnas)+" as id"
@@ -26,7 +26,7 @@ def update_invoice(cur, columnas):
 
     cur.execute("select {} from {}".format(columnas_select, "account_invoice"))
     for l in cur:
-        print(cur.mogrify("update {} set {} where id = %s;".format("account_move", columnas_update), l))
+        print(cur.mogrify("update {} set {} where id = %s;".format("account_move", columnas_update), l).decode("utf-8"))
 
 conn = psycopg2.connect("dbname={} user={}".format(sys.argv[1], sys.argv[2]))
 cur = conn.cursor()

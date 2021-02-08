@@ -127,22 +127,32 @@ if 'importaciones' in sys.argv[3]:
 # rrhh
 if 'rrhh' in sys.argv[3]:
     print("delete from hr_salary_rule_rrhh_recibo_linea_rel;")
+    print("delete from rrhh_entrada_linea;")
     print("delete from rrhh_recibo_linea;")
     print("delete from rrhh_recibo;")
+    print("delete from rrhh_prestamo_linea")
+    print("delete from rrhh_prestamo")
     print("delete from hr_salary_rule_rrhh_planilla_columna_rel;")
+    print("delete from hr_rule_input_rrhh_planilla_columna_rel;")
     print("delete from rrhh_planilla_columna;")
     print("delete from rrhh_planilla;")
     
+    update(cur, "account_payment", ["nomina_id", "id"])
+    update(cur, "hr_payslip_run", ["porcentaje_prestamo", "id"])
     insert(cur, "rrhh_recibo", ["id", "name", "descripcion"])
     insert(cur, "rrhh_recibo_linea", ["id", "name", "tipo", "sequence", "recibo_id"])
+    insert(cur, "hr_salary_rule_rrhh_recibo_linea_rel", ["rrhh_recibo_linea_id", "hr_salary_rule_id"], iniciar_seq=False)
     update(cur, "hr_contract_type", ["calcula_indemnizacion", "id"])
-    update(cur, "hr_contract", ["motivo_terminacion", "base_extra", "wage", "id"])
-    update(cur, "hr_employee", ["numero_liquidacion", "codigo_centro_trabajo", "codigo_ocupacion", "condicion_laboral", "department_id", "diario_pago_id", "igss", "irtra", "nit", "recibo_id", "nivel_academico", "profesion", "etnia", "idioma", "pais_origen", "trabajado_extranjero", "motivo_finalizacion", "jornada_trabajo", "permiso_trabajo", "contacto_emergencia", "marital", "vecindad_dpi", "tarjeta_salud", "tarjeta_manipulacion", "tarjeta_pulmones", "tarjeta_fecha_vencimiento", "codigo_empleado", "id"])
+    update(cur, "hr_contract", ["motivo_terminacion", "base_extra", "fecha_reinicio_labores", "temporalidad_contrato", "calcula_indemnizacion", "id"])
+    insert(cur, "rrhh_prestamo", ["employee_id", "fecha_inicio", "numero_descuentos", "total", "mensualidad", "descripcion", "codigo", "estado"])
+    insert(cur, "rrhh_prestamo_linea", ["mes", "monto", "anio", "nomina_id", "prestamo_id"])
+    update(cur, "hr_employee", ["numero_liquidacion", "codigo_centro_trabajo", "codigo_ocupacion", "condicion_laboral", "job_id", "department_id", "diario_pago_id", "igss", "irtra", "nit", "recibo_id", "nivel_academico", "profesion", "etnia", "idioma", "pais_origen", "trabajado_extranjero", "motivo_finalizacion", "jornada_trabajo", "permiso_trabajo", "contacto_emergencia", "marital", "vecindad_dpi", "tarjeta_salud", "tarjeta_manipulacion", "tarjeta_pulmones", "tarjeta_fecha_vencimiento", "codigo_empleado", "departamento_id", "pais_id", "documento_identificacion", "forma_trabajo_extranjero", "pais_trabajo_extranjero_id", "finalizacion_laboral_extranjero", "pueblo_pertenencia", "primer_nombre", "segundo_nombre", "primer_apellido", "segundo_apellido", "apellido_casada", "centro_trabajo_id", "id"])
     insert(cur, "rrhh_planilla", ["id", "name", "descripcion"])
     insert(cur, "rrhh_planilla_columna", ["id", "name", "sequence", "planilla_id", "sumar"])
     insert(cur, "hr_salary_rule_rrhh_planilla_columna_rel", ["rrhh_planilla_columna_id", "hr_salary_rule_id"], iniciar_seq=False)
-    insert(cur, "hr_salary_rule_rrhh_recibo_linea_rel", ["rrhh_recibo_linea_id", "hr_salary_rule_id"], iniciar_seq=False)
-    update(cur, "res_company", ["version_mensaje", "numero_patronal", "tipo_planilla", "codigo_centro_trabajo", "nombre_centro_trabajo", "direccion_centro_trabajo", "zona_centro_trabajo", "telefonos", "nombre_contacto", "correo_electronico", "codigo_departamento", "codigo_municipio", "codigo_actividad_economica", "identificacion_tipo_planilla", "nombre_tipo_planilla", "tipo_afiliados", "periodo_planilla", "departamento_republica", "actividad_economica", "clase_planilla", "id"])
+    insert(cur, "hr_rule_input_rrhh_planilla_columna_rel", ["rrhh_planilla_columna_id", "hr_rule_input_id"], iniciar_seq=False)
+    insert(cur, "rrhh_entrada_linea", ["id", "input_id", "recibo_id"])
+    update(cur, "res_company", ["version_mensaje", "numero_patronal", "tipo_planilla", "codigo_centro_trabajo", "nombre_centro_trabajo", "direccion_centro_trabajo", "zona_centro_trabajo", "fax", "telefonos", "nombre_contacto", "correo_electronico", "codigo_departamento", "codigo_municipio", "codigo_actividad_economica", "identificacion_tipo_planilla", "nombre_tipo_planilla", "tipo_afiliados", "periodo_planilla", "departamento_republica", "actividad_economica", "clase_planilla", "representante_legal_id", "origen_compania", "barrio_colonia", "nomenclatura", "sindicato", "contratar_personal", "contabilidad_completa", "rango_ingresos", "jefe_recursos_humanos_id", "anio_inicio_operaciones", "tamanio_empresa_ventas", "tamanio_empresa_trabajadores", "actividad_gran_grupo", "sub_actividad_economica", "ocupacion_grupo", "id"])
 
 # pos_gface
 if 'pos_gface' in sys.argv[3]:

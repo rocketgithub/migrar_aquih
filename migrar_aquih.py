@@ -1,11 +1,11 @@
 import sys
 import psycopg2
 
-def update(cur, tabla, columnas):
+def update(cur, tabla, columnas, where=""):
     columnas_select = ", ".join(columnas)
     columnas_update = ", ".join([x+" = %s" for x in columnas[: -1]])
 
-    cur.execute("select {} from {}".format(columnas_select, tabla))
+    cur.execute("select {} from {} {}".format(columnas_select, tabla, "where "+where if where else ""))
     for l in cur:
         print(cur.mogrify("update {} set {} where id = %s;".format(tabla, columnas_update), l).decode("utf-8"))
 
@@ -127,25 +127,26 @@ if 'importaciones' in sys.argv[3]:
 # rrhh
 if 'rrhh' in sys.argv[3]:
     print("delete from hr_salary_rule_rrhh_recibo_linea_rel;")
-    print("delete from rrhh_entrada_linea;")
     print("delete from rrhh_recibo_linea;")
     print("delete from rrhh_recibo;")
     print("delete from rrhh_prestamo_linea;")
     print("delete from rrhh_prestamo;")
     print("delete from hr_salary_rule_rrhh_planilla_columna_rel;")
-    print("delete from hr_rule_input_rrhh_planilla_columna_rel;")
+    print("delete from hr_payslip_input_type_rrhh_planilla_columna_rel;")
     print("delete from rrhh_planilla_columna;")
     print("delete from rrhh_planilla;")
+    print("delete from rrhh_entrada_linea;")
     
-    update(cur, "account_payment", ["nomina_id", "id"])
+    update(cur, "account_payment", ["nomina_id", "id"], where="nomina_id is not null")
     update(cur, "hr_payslip_run", ["porcentaje_prestamo", "id"])
     insert(cur, "rrhh_recibo", ["id", "name", "descripcion"])
     insert(cur, "rrhh_recibo_linea", ["id", "name", "tipo", "sequence", "recibo_id"])
     insert(cur, "hr_salary_rule_rrhh_recibo_linea_rel", ["rrhh_recibo_linea_id", "hr_salary_rule_id"], iniciar_seq=False)
     update(cur, "hr_contract_type", ["calcula_indemnizacion", "id"])
     update(cur, "hr_contract", ["motivo_terminacion", "base_extra", "fecha_reinicio_labores", "temporalidad_contrato", "calcula_indemnizacion", "id"])
-    insert(cur, "rrhh_prestamo", ["employee_id", "fecha_inicio", "numero_descuentos", "total", "mensualidad", "descripcion", "codigo", "estado"])
-    insert(cur, "rrhh_prestamo_linea", ["mes", "monto", "anio", "nomina_id", "prestamo_id"])
+    insert(cur, "rrhh_prestamo", ["id", "employee_id", "fecha_inicio", "numero_descuentos", "total", "mensualidad", "descripcion", "codigo", "estado"])
+    insert(cur, "rrhh_prestamo_linea", ["id", "mes", "monto", "anio", "prestamo_id"])
+    insert(cur, "prestamo_nominda_id_rel", ["rrhh_prestamo_linea_id", "hr_payslip_id"], iniciar_seq=False)
     update(cur, "hr_employee", ["numero_liquidacion", "codigo_centro_trabajo", "codigo_ocupacion", "condicion_laboral", "job_id", "department_id", "diario_pago_id", "igss", "irtra", "nit", "recibo_id", "nivel_academico", "profesion", "etnia", "idioma", "pais_origen", "trabajado_extranjero", "motivo_finalizacion", "jornada_trabajo", "permiso_trabajo", "contacto_emergencia", "marital", "vecindad_dpi", "tarjeta_salud", "tarjeta_manipulacion", "tarjeta_pulmones", "tarjeta_fecha_vencimiento", "codigo_empleado", "departamento_id", "pais_id", "documento_identificacion", "forma_trabajo_extranjero", "pais_trabajo_extranjero_id", "finalizacion_laboral_extranjero", "pueblo_pertenencia", "primer_nombre", "segundo_nombre", "primer_apellido", "segundo_apellido", "apellido_casada", "centro_trabajo_id", "id"])
     insert(cur, "rrhh_planilla", ["id", "name", "descripcion"])
     insert(cur, "rrhh_planilla_columna", ["id", "name", "sequence", "planilla_id", "sumar"])

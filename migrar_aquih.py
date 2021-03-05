@@ -60,7 +60,7 @@ if 'activos' in sys.argv[1]:
 
     insert(cur, "activos_localidad", ["id", "name", "create_date", "write_date", "create_uid", "write_uid"])
     #insert(cur, "activos_area", ["id", "name", "create_date", "write_date", "create_uid", "write_uid"])
-    update(cur, "account_asset_asset", ["localidad_id", "responsable_id", "numero_de_serie", "marca", "modelo", "etiqueta", "estado", "id"])
+    update(cur, "account_asset_asset", ["localidad_id", "responsable_id", "numero_de_serie", "marca", "modelo", "etiqueta", "estado", "id"], tabla_destino="account_asset")
 
 # bolson
 if 'bolson' in sys.argv[1]:
@@ -86,6 +86,10 @@ if 'gface_infile' in sys.argv[1]:
     update(cur, "account_invoice", ["firma_gface", "pdf_gface", "move_id"], tabla_destino="account_move", where="firma_gface is not null or pdf_gface is not null")
     #update(cur, "account_journal", ["usuario_gface", "clave_gface", "nombre_establecimiento_gface", "tipo_documento_gface", "serie_documento_gface", "serie_gface", "numero_resolucion_gface", "fecha_resolucion_gface", "rango_inicial_gface", "rango_final_gface", "numero_establecimiento_gface", "dispositivo_gface", "id"])
 
+# gface_guatefactura
+if 'gface_guatefactura' in sys.argv[1]:
+    update(cur, "account_invoice", ["firma_gface", "nombre_cliente_gface", "direccion_cliente_gface", "move_id"], tabla_destino="account_move", where="firma_gface is not null")
+
 # gface_ecofacturas
 if 'gface_ecofacturas' in sys.argv[1]:
     cur.execute("select {} from {}".format("name as ref, move_id", "account_invoice"))
@@ -103,16 +107,16 @@ if 'l10n_gt_extra' in sys.argv[1]:
 
 # pos_gt
 if 'pos_gt' in sys.argv[1]:
-    print("delete from pos_gt_bom_extra_line;")
+    #print("delete from pos_gt_bom_extra_line;")
     print("delete from pos_gt_extra_line;")
     print("delete from pos_gt_extra;")
     print("delete from pos_gt_extra_product_template_rel;")
 
-    insert(cur, "pos_gt_bom_extra_line", ["id", "name", "product_id", "product_qty", "product_uom_id", "bom_id", "create_date", "write_date", "create_uid", "write_uid"])
-    update(cur, "pos_config", ["allow_discount", "allow_price_change", "ask_tag_number", "takeout_option", "default_client_id", "analytic_account_id", "id"])
+    #insert(cur, "pos_gt_bom_extra_line", ["id", "name", "product_id", "product_qty", "product_uom_id", "bom_id", "create_date", "write_date", "create_uid", "write_uid"])
+    update(cur, "pos_config", ["allow_discount", "ask_tag_number", "takeout_option", "default_client_id", "analytic_account_id", "id"])
     insert(cur, "pos_gt_extra", ["id", "name", "company_id", "type", "create_date", "write_date", "create_uid", "write_uid"])
     insert(cur, "pos_gt_extra_line", ["id", "name", "extra_id", "product_id", "qty", "price_extra", "company_currency_id", "create_date", "write_date", "create_uid", "write_uid"])
-    insert(cur, "pos_gt_extra_product_template_rel", ["product_template_id", "pos_gt_extra_id", "create_date", "write_date", "create_uid", "write_uid"], iniciar_seq=False)
+    insert(cur, "pos_gt_extra_product_template_rel", ["product_template_id", "pos_gt_extra_id"], iniciar_seq=False)
     update(cur, "res_users", ["default_pos_id", "id"])
 
 # pos_sat
@@ -130,7 +134,7 @@ if 'fel_gt' in sys.argv[1]:
 
 # fel_infile
 if 'fel_infile' in sys.argv[1]:
-    update(cur, "account_invoice", ["pdf_fel", "move_id"], tabla_destino="account_move")
+    update(cur, "account_invoice", ["pdf_fel", "move_id"], tabla_destino="account_move", where="pdf_fel is not null")
 
 # importaciones
 if 'importaciones' in sys.argv[1]:
@@ -255,27 +259,27 @@ if 'fitnessone' in sys.argv[1]:
     print("delete from hr_entrada_bono;")
     print("delete from hr_linea_bonos;")
 
-#    update(cur, "account_journal", ["codigo_jonas", "sucursal", "permitir_extractos", "comision", "id"])
-#    update(cur, "account_invoice", ["sinc_id", "move_id"], tabla_destino="account_move", where="sinc_id is not null")
-#    update(cur, "account_invoice_line", ["referencia_pago", "id"], where="referencia_pago is not null")
-#    update(cur, "account_analytic_account", ["user_id", "id"], where="user_id is not null")
-#    update(cur, "crm_lead", ["sede_id", "id"])
+    update(cur, "account_journal", ["codigo_jonas", "sucursal", "permitir_extractos", "comision", "id"])
+    update(cur, "account_invoice", ["sinc_id", "move_id"], tabla_destino="account_move", where="sinc_id is not null")
+    update(cur, "account_invoice_line", ["referencia_pago", "id"], tabla_destino="account_move_line", where="referencia_pago is not null")
+    update(cur, "account_analytic_account", ["user_id", "id"], where="user_id is not null")
 #    insert(cur, "fitnessone_sincronizacion_programada", ["id", "fecha_carga", "partner_id", "diario_factura_id", "diario_pago_id", "invoice_id", "team_id", "account_analytic_id", "pagar_factura", "barcode", "monto_total", "fecha_procesado", "prioridad", "error", "nota", "create_date", "write_date", "create_uid", "write_uid"])
 #    insert(cur, "fitnessone_sincronizacion_programada_linea", ["id", "programada_id", "codigo_producto", "descripcion", "monto", "referencia_pago", "create_date", "write_date", "create_uid", "write_uid"])
-#    insert(cur, "fitnessone_pos_motivo", ["id", "name", "create_date", "write_date", "create_uid", "write_uid"])
-#    insert(cur, "fitnessone_pos_motivos_linea", ["id", "departamento", "correo", "journal_id", "motivo_id", "create_date", "write_date", "create_uid", "write_uid"])
-#    insert(cur, "fitnessone_marca", ["id", "name", "create_date", "write_date", "create_uid", "write_uid"])
-#    insert(cur, "fitnessone_sede", ["id", "name", "marca_id", "equipo_ventas_id", "stage_id", "plantilla_contabilidad_id", "plantilla_cliente_id", "plantilla_invitacion_id", "create_date", "write_date", "create_uid", "write_uid"])
-#    insert(cur, "fitnessone_presupuesto_nomina", ["id", "nombre", "responsable_id", "fecha_desde", "fecha_hasta", "company_id", "create_date", "write_date", "create_uid", "write_uid"])
-#    insert(cur, "fitnessone_presupuesto_nomina_lineas", ["id", "presupuesto_id", "posicion_presupuestaria_id", "cuenta_analitica_id", "departamento_id", "puesto_trabajo_id", "nombre", "fecha_desde", "fecha_hasta", "monto", "company_id", "create_date", "write_date", "create_uid", "write_uid"])
-#    insert(cur, "reglas_ids_presupuestos_rel", ["fitnessone_presupuesto_nomina_lineas_id", "hr_salary_rule_id"])
-#    update(cur, "hr_employee", ["tipo_discapacidad", "tipo_contrato", "trabajo_especifico", "id"])
-#    update(cur, "hr_contract", ["horario_trabajo", "forma_jornada", "jornada", "valor_honorarios", "id"])
-#    insert(cur, "hr_linea_bonos", ["id", "puesto_id", "empleado_id", "cuenta_analitica_id", "mes", "anio", "name", "porcentaje", "rango_inicial", "rango_final", "valor", "calculo_rango", "monto", "codigo", "producto_id", "rangos", "sumar", "active", "create_date", "write_date", "create_uid", "write_uid"])
-#    insert(cur, "hr_entrada_bono", ["id", "empleado_id", "mes", "anio", "estado", "puesto_id", "tipo", "total", "cuenta_analitica_id", "create_date", "write_date", "create_uid", "write_uid"])
-#    insert(cur, "hr_linea_entrada_bono", ["id", "entrada_bono_id", "linea_bono_id", "aplica", "porcentaje", "valor", "create_date", "write_date", "create_uid", "write_uid"])
-#    insert(cur, "hr_linea_bono_rango", ["id", "linea_bono_id", "rango_inicial", "rango_final", "monto", "create_date", "write_date", "create_uid", "write_uid"])
-#    insert(cur, "hr_linea_empleado_presupuestado", ["id", "puesto_id", "cantidad", "fecha_inicio", "fecha_fin", "cantidad_real", "variacion", "create_date", "write_date", "create_uid", "write_uid"])
+    insert(cur, "fitnessone_pos_motivo", ["id", "name", "create_date", "write_date", "create_uid", "write_uid"])
+    insert(cur, "fitnessone_pos_motivos_linea", ["id", "departamento", "correo", "journal_id", "motivo_id", "create_date", "write_date", "create_uid", "write_uid"])
+    insert(cur, "fitnessone_marca", ["id", "name", "create_date", "write_date", "create_uid", "write_uid"])
+    insert(cur, "fitnessone_sede", ["id", "name", "marca_id", "equipo_ventas_id", "stage_id", "plantilla_contabilidad_id", "plantilla_cliente_id", "plantilla_invitacion_id", "create_date", "write_date", "create_uid", "write_uid"])
+    insert(cur, "fitnessone_presupuesto_nomina", ["id", "nombre", "responsable_id", "fecha_desde", "fecha_hasta", "company_id", "create_date", "write_date", "create_uid", "write_uid"])
+    insert(cur, "fitnessone_presupuesto_nomina_lineas", ["id", "presupuesto_id", "posicion_presupuestaria_id", "cuenta_analitica_id", "departamento_id", "puesto_trabajo_id", "nombre", "fecha_desde", "fecha_hasta", "monto", "company_id", "create_date", "write_date", "create_uid", "write_uid"])
+    update(cur, "crm_lead", ["sede_id", "id"])
+    insert(cur, "reglas_ids_presupuestos_rel", ["fitnessone_presupuesto_nomina_lineas_id", "hr_salary_rule_id"], iniciar_seq=False)
+    update(cur, "hr_employee", ["tipo_discapacidad", "tipo_contrato", "trabajo_especifico", "id"])
+    update(cur, "hr_contract", ["horario_trabajo", "forma_jornada", "jornada", "valor_honorarios", "id"])
+    insert(cur, "hr_linea_bonos", ["id", "puesto_id", "empleado_id", "cuenta_analitica_id", "mes", "anio", "name", "porcentaje", "rango_inicial", "rango_final", "valor", "calculo_rango", "monto", "codigo", "producto_id", "rangos", "sumar", "active", "create_date", "write_date", "create_uid", "write_uid"])
+    insert(cur, "hr_entrada_bono", ["id", "empleado_id", "mes", "anio", "estado", "puesto_id", "tipo", "total", "cuenta_analitica_id", "create_date", "write_date", "create_uid", "write_uid"])
+    insert(cur, "hr_linea_entrada_bono", ["id", "entrada_bono_id", "linea_bono_id", "aplica", "porcentaje", "valor", "create_date", "write_date", "create_uid", "write_uid"])
+    insert(cur, "hr_linea_bono_rango", ["id", "linea_bono_id", "rango_inicial", "rango_final", "monto", "create_date", "write_date", "create_uid", "write_uid"])
+    insert(cur, "hr_linea_empleado_presupuestado", ["id", "puesto_id", "cantidad", "fecha_inicio", "fecha_fin", "cantidad_real", "variacion", "create_date", "write_date", "create_uid", "write_uid"])
     update(cur, "hr_payslip", ["puesto_trabajo_id", "departamento_id", "id"])
     update(cur, "mrp_bom", ["costo_total", "margen_porcentual", "margen", "id"])
     update(cur, "res_partner", ["sinc_id", "genero", "auto_renovacion", "club_id", "club_nombre", "fecha_nacimiento", "contacto_emergencia", "telefono_emergencia", "fecha_expiracion", "nombre_grupo", "numero_grupo", "fecha_ingreso", "fecha_ultima_modificacion", "fecha_miembro_desde", "tipo_miembro", "tipo_membresia", "vendedor_id", "vendedor_nombre", "estado", "estado_fecha_final", "estado_id", "estado_razon", "telefono_trabajo", "id"])
@@ -283,7 +287,7 @@ if 'fitnessone' in sys.argv[1]:
     update(cur, "pos_order", ["sinc_id", "motivo_id", "departamento", "correo", "id"])
     update(cur, "purchase_order_line", ["autorizado", "id"])
     update(cur, "purchase_order", ["estado_orden", "nomina_id", "id"])
-    update(cur, "sale_order", ["sede_id", "marca_id", "id"])
+    update(cur, "sale_order", ["sede_id", "id"])
 
 cur.close()
 conn.close()

@@ -131,6 +131,7 @@ if 'fel_gt' in sys.argv[1]:
     update(cur, "account_invoice", ["firma_fel", "serie_fel", "numero_fel", "factura_original_id", "consignatario_fel", "comprador_fel", "exportador_fel", "incoterm_fel", "move_id"], tabla_destino="account_move")
     update(cur, "account_journal", ["tipo_documento_fel", "id"])
     update(cur, "res_company", ["frases_fel", "adenda_fel", "id"])
+    update(cur, "res_partner", ["nombre_facturacion_fel", "id"], where="nombre_facturacion_fel is not null")
 
 # fel_infile
 if 'fel_infile' in sys.argv[1]:
